@@ -1,8 +1,9 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: uns
+namespace: kkm
 
 resources:
+  - litmus-uns-namespace.yml
   - acr-secret.yml
   - litmusautomation-uns-centralportal-secret.yml
   - litmus-uns-edited-helm-values.yml
