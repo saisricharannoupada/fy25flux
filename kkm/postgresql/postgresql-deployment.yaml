@@ -11,10 +11,28 @@ data:
   postgresql.conf: |
     # Listen on all interfaces
     listen_addresses = '*'
-    # Optionally change other settings like max_connections, shared_buffers, etc.
 
+    # Enable pgaudit extension
+    shared_preload_libraries = 'pgaudit'
+
+    # pgaudit settings to log all types of activities
+    pgaudit.log = 'read, write, ddl, role, login, function'
+
+    # Whether to log system catalog queries
+    pgaudit.log_catalog = on
+
+    # Log verbosity for pgaudit
+    pgaudit.log_level = info
+
+    # Whether to log the first occurrence of a statement only
+    pgaudit.log_statement_once = off
+
+    # Whether to log function parameters
+    pgaudit.log_parameter = on
+
+    # Optionally change other settings like max_connections, shared_buffers, etc.
   pg_hba.conf: |
-    # Allow all IPs to connect
+    # Allow all IPs to connect (adjust as needed for your security policy)
     host    all             all             0.0.0.0/0            md5
     host    all             all             ::/0                 md5
 ---
@@ -65,7 +83,7 @@ spec:
     requests:
       storage: 10Gi
 ---
-# Deployment for PostgreSQL 
+# Deployment for PostgreSQL with pgaudit enabled
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -82,16 +100,16 @@ spec:
         app: postgres
     spec:
       imagePullSecrets:
-        - name: acr-secret  # Added imagePullSecrets for ACR authentication
+        - name: acr-secret  # Image pull secret for ACR authentication
       containers:
         - name: postgres
-          image: litmus.azurecr.io/postgres:12  # Updated image to use ACR-hosted Postgres image
+          image: litmus.azurecr.io/postgres:12  # PostgreSQL image from ACR
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5432
           envFrom:
             - configMapRef:
-                name: postgres-secret  # Reference updated to postgres-secret
+                name: postgres-secret
           env:
             - name: PGDATA
               value: /var/lib/postgresql/data
@@ -112,7 +130,7 @@ spec:
           configMap:
             name: postgres-config
 ---
-# Service definition for PostgreSQL with internal LoadBalancer for Azure
+# Service definition for PostgreSQL
 apiVersion: v1
 kind: Service
 metadata:
