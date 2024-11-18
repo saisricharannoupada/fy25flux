@@ -3,5 +3,9 @@ kind: Kustomization
 namespace: kkm
 
 resources:
-  - kkm
+  - grafana
+  - postgresql
+  - influxdb
+  - litmus-edge
+  - litmus-uns
 
