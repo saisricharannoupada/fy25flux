@@ -1,4 +1,4 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: uns  # Name of the namespace
+  name: le-prod  # Name of the namespace
